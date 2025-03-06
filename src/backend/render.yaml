@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: sentiment-api
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -w 4 -k uvicorn.workers.UvicornWorker api:app"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+
+  - type: cron
+    name: sentiment-scraper
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python scheduler.py"
+    schedule: "0 7 * * *"
