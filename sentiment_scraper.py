@@ -12,6 +12,11 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from database import get_db_connection
 
 # Sentiment Analysis Function
+def analyze_sentiment(text):
+    analyzer = SentimentIntensityAnalyzer()
+    return analyzer.polarity_scores(text)["compound"]
+
+# Scrape and Analyze Tweets
 def scrape_tweets():
     query = """
     (#Sustainability OR #ClimateAction OR #RenewableEnergy OR #NetZero OR 
