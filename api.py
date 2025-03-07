@@ -10,6 +10,10 @@ from database import get_db_connection
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI is running!"}
+
 @app.get("/sentiment_score")
 def get_sentiment_score():
     conn = get_db_connection()
