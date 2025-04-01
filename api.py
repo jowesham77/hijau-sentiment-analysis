@@ -47,13 +47,21 @@ def get_sentiment_trend(timeframe: str = "week"):
     # Group by date and calculate average sentiment per day
     conn = get_db_connection()
     cursor = conn.cursor()
+    query_map = {
+        "day": "1 day",
+        "week": "7 days",
+        "month": "1 month",
+        "year": "1 year"
+    }
+    interval = query_map.get(timeframe, "7 days")
+
     cursor.execute(f"""
         SELECT DATE(date) as day, AVG(sentiment_score)
         FROM sentiment
         WHERE date >= NOW() - INTERVAL %s
         GROUP BY day
         ORDER BY day ASC
-    """, (timeframe,))
+    """, (interval,))
     rows = cursor.fetchall()
     conn.close()
     return [{"date": str(row[0]), "index": round(row[1]*100, 2)} for row in rows]

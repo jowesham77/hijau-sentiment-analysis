@@ -11,7 +11,7 @@ import psycopg2
 import os
 
 def get_db_connection():
-    return psycopg2.connect(os.environ["DATABASE_URL"])
+    return psycopg2.connect(os.environ["postgresql://hijau_sentiment0sql_user:II3PvqlGzGhpZjYkLPATDZho22CIRmwc@dpg-cv53d8a3esus73aoghug-a.oregon-postgres.render.com/hijau_sentiment0sql"])
 
 
 """import psycopg2
