@@ -7,8 +7,14 @@ PostgreSQL is always used.
 
 """
 
-
 import psycopg2
+import os
+
+def get_db_connection():
+    return psycopg2.connect(os.environ["DATABASE_URL"])
+
+
+"""import psycopg2
 import os
 
 DB_URL = os.getenv("DATABASE_URL")
@@ -28,4 +34,4 @@ def create_db():
                    )''')
     conn.commit()
     cursor.close()
-    conn.close()
+    conn.close()"""

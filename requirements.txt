@@ -1,7 +1,6 @@
 fastapi
 uvicorn
-snscrape
+praw
 vaderSentiment
-pandas
 psycopg2-binary
-gunicorntweepy
+gunicorn

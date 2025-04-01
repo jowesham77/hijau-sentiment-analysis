@@ -1,9 +1,16 @@
 // export NODE_OPTIONS=--openssl-legacy-provider
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
+// Helper: Convert sentiment score (0–1) to label
+function getSentimentLabel(score) {
+  if (score >= 0.75) return "Greedy";
+  if (score >= 0.55) return "Neutral";
+  if (score >= 0.3) return "Fearful";
+  return "Very Fearful";
+}
 
 const mockData = [
   { date: "2024-02-13", index: 45 },
@@ -144,28 +151,54 @@ function ArticleCard({ image, category, title, author, timeAgo, featured }) {
 }
 
 function HijauSentiment() {
-  const [selectedPeriod, setSelectedPeriod] = useState("7days");
+  const [selectedPeriod, setSelectedPeriod] = useState("week");
+  const [sentimentScore, setSentimentScore] = useState(null);
+  const [sentimentTrend, setSentimentTrend] = useState([]);
+  const [topPosts, setTopPosts] = useState([]);
+  
+  useEffect(() => {
+    fetch(`https://hijau-sentiment-analysis-1.onrender.com/sentiment_score?timeframe=${selectedPeriod}`)
+      .then(res => res.json())
+      .then(data => setSentimentScore(data.sentiment_score));
+  
+    fetch(`https://hijau-sentiment-analysis-1.onrender.com/sentiment_trend?timeframe=${selectedPeriod}`)
+      .then(res => res.json())
+      .then(data => setSentimentTrend(data));
+  
+    fetch(`https://hijau-sentiment-analysis-1.onrender.com/top_reddit_posts?limit=5`)
+      .then(res => res.json())
+      .then(data => setTopPosts(data));
+  }, [selectedPeriod]);
+
+  const sentimentLabel = sentimentScore !== null ? getSentimentLabel(sentimentScore) : "Loading...";
+  
   return(
     <div className="container">
         <h2 className="subtitle">Sustainability Sentiment Analysis</h2>
-        <p className="description">This graph visualizes overall sentiment trends on sustainability topics</p>
+        <p className="description">This graph visualizes overall sentiment trends from Reddit sustainability communities</p>
 
         <div className="card-container">
           <div className="card">
             <h3>Fear & Greed Index</h3>
-            <p>Current Score: <span className="highlight">58 (Neutral)</span></p>
+            <p>Current Score: <span className="highlight">
+            {sentimentScore !== null 
+              ? `${Math.round(sentimentScore * 100)} (${sentimentLabel})` 
+              : "Loading..."}
+              </span></p>
+            <p className="source-note">Source: Reddit posts from r/sustainability, r/climate, and r/renewableenergy</p>
           </div>
           <div className="card">
             <h3>Historical Values</h3>
             <ul>
-              <li>Yesterday: <span className="highlight">55 (Neutral)</span></li>
-              <li>Last Week: <span className="highlight">50 (Neutral)</span></li>
-              <li>Last Month: <span className="highlight">40 (Fearful)</span></li>
+            {/* Placeholder for future historical data */}
+            <li>Yesterday: <span className="highlight">Coming Soon</span></li>
+            <li>Last Week: <span className="highlight">Coming Soon</span></li>
+            <li>Last Month: <span className="highlight">Coming Soon</span></li>
             </ul>
           </div>
           <div className="card">
             <h3>Next Updates</h3>
-            <p>Hourly, 7 hours, 3 minutes</p>
+            <p>Daily at 7:00 AM</p>
           </div>
         </div>
 
@@ -181,7 +214,7 @@ function HijauSentiment() {
 
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={mockData}>
+              <LineChart data={sentimentTrend}>
                 <XAxis dataKey="date" stroke="#8884d8" />
                 <YAxis stroke="#8884d8" />
                 <Tooltip />
@@ -189,6 +222,18 @@ function HijauSentiment() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </div>
+
+        <div className="top-posts-section">
+          <h3>Top Reddit Posts</h3>
+          <ul>
+            {topPosts.map((post, index) => (
+              <li key={index}>
+                <strong>{post.date}</strong> - Score: {Math.round(post.score * 100)}
+                <p>{post.text}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
   );

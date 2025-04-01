@@ -347,3 +347,51 @@ hr {
     max-height: 300px;
   }
 }
+
+/* Reddit Posts Styles */
+
+.top-posts-section {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid rgb(95, 95, 95);
+  border-radius: 5px;
+}
+
+.top-posts-section h3 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #000000;
+  text-align: center;
+}
+
+.top-posts-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.top-posts-section li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+}
+
+.top-posts-section li strong {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.top-posts-section li p {
+  margin: 0;
+  font-size: 15px;
+  color: #222;
+  line-height: 1.4;
+}

@@ -6,16 +6,71 @@ This script:
 - Stores data in PostgreSQL
 
 """
+
+import praw
+import datetime
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from database import get_db_connection
+
+# === CONFIG ===
+REDDIT_CLIENT_ID = "xMgGYXP3LJNxJMtyc6nH5Q"
+REDDIT_CLIENT_SECRET = "9guCl-kSpRTMrvygTWBQLRUUWMnw9A"
+REDDIT_USER_AGENT = "ProfessionalBill5616"
+GOOGLE_NEWS_API_KEY = "your_google_news_api_key"
+
+analyzer = SentimentIntensityAnalyzer()
+
+def analyze_sentiment(text):
+    return analyzer.polarity_scores(text)["compound"]
+
+def scrape_reddit(historical=False):
+    reddit = praw.Reddit(
+        client_id=REDDIT_CLIENT_ID,
+        client_secret=REDDIT_CLIENT_SECRET,
+        user_agent=REDDIT_USER_AGENT
+    )
+
+    subreddits = ["sustainability", "climate", "renewableenergy"]
+    posts_data = []
+
+    for subreddit in subreddits:
+        posts = reddit.subreddit(subreddit).hot(limit=500) if historical else reddit.subreddit(subreddit).new(limit=100)
+        for post in posts:
+            post_time = datetime.datetime.utcfromtimestamp(post.created_utc)
+            score = analyze_sentiment(post.title + " " + post.selftext)
+            posts_data.append((post_time, post.title, score))
+
+    if posts_data:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.executemany("INSERT INTO sentiment (date, tweet, sentiment_score) VALUES (%s, %s, %s)", posts_data)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print(f"✅ Stored {len(posts_data)} Reddit posts.")
+    else:
+        print("⚠️ No new Reddit posts found.")
+
+if __name__ == "__main__":
+    # Run historical collection ONCE
+    scrape_reddit(historical=True)
+
+    # Run these daily
+    scrape_reddit(historical=False)
+
+
+
+"""
 import tweepy
 import datetime
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from database import get_db_connection
 
-# 🔑 Replace these with your actual API credentials
-API_KEY = "your_api_key"
-API_SECRET = "your_api_secret"
-ACCESS_TOKEN = "your_access_token"
-ACCESS_SECRET = "your_access_secret"
+# 🔑 API credentials
+API_KEY = "dvpDt97al6NlSQnwC9u1rxMNn"
+API_SECRET = "wxeRfbL8AvCWcycgOdcNbEU6BJe1JhLOr0juEoRLY6jMjrMYsz"
+ACCESS_TOKEN = "998204003505729537-3ywhLfqgznHXUjxp2saIm2h5lhfyhFE"
+ACCESS_SECRET = "8hjRzHvd8rN3lU6zYti9k91sDCq2P586HjIsyLuvyn6ak"
 
 # Authenticate with Twitter API
 auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
@@ -57,7 +112,8 @@ if __name__ == "__main__":
 
 
 
-"""
+
+if use snscrape:
 
 import snscrape.modules.twitter as sntwitter
 import datetime
@@ -71,11 +127,11 @@ def analyze_sentiment(text):
 
 # Scrape and Analyze Tweets
 def scrape_tweets():
-    query = """
+    query = 
     (#Sustainability OR #ClimateAction OR #RenewableEnergy OR #NetZero OR 
     #ESG OR #GreenTech OR #CarbonNeutral OR #ClimateCrisis OR #EcoFriendly) 
     since:2023-03-01 until:2024-03-01
-    """
+    
     tweets_data = []
 
     for tweet in sntwitter.TwitterSearchScraper(f"{query}").get_items():
