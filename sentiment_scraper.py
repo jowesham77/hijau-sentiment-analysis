@@ -16,7 +16,6 @@ from database import get_db_connection
 REDDIT_CLIENT_ID = "xMgGYXP3LJNxJMtyc6nH5Q"
 REDDIT_CLIENT_SECRET = "9guCl-kSpRTMrvygTWBQLRUUWMnw9A"
 REDDIT_USER_AGENT = "ProfessionalBill5616"
-GOOGLE_NEWS_API_KEY = "your_google_news_api_key"
 
 analyzer = SentimentIntensityAnalyzer()
 
