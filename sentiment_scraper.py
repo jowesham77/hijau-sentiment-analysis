@@ -11,6 +11,8 @@ import praw
 import datetime
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from database import get_db_connection
+from datetime import datetime, timezone
+import time
 
 # === CONFIG ===
 REDDIT_CLIENT_ID = "xMgGYXP3LJNxJMtyc6nH5Q"
@@ -31,13 +33,19 @@ def scrape_reddit(historical=False):
 
     subreddits = ["sustainability", "climate", "renewableenergy"]
     posts_data = []
+    one_day_ago = time.time() - (24 * 60 * 60)  # UNIX time for 24 hours ago
 
     for subreddit in subreddits:
         posts = reddit.subreddit(subreddit).hot(limit=500) if historical else reddit.subreddit(subreddit).new(limit=100)
+
         for post in posts:
-            post_time = datetime.datetime.utcfromtimestamp(post.created_utc)
+            post_time = post.created_utc
+            if not historical and post_time < one_day_ago:
+                continue  # Skip older posts if we're doing daily
+
+            dt = datetime.fromtimestamp(post_time, tz=timezone.utc)
             score = analyze_sentiment(post.title + " " + post.selftext)
-            posts_data.append((post_time, post.title, score))
+            posts_data.append((dt, post.title, score))
 
     if posts_data:
         conn = get_db_connection()

@@ -207,7 +207,7 @@ function HijauSentiment() {
           <div className="button-group">
             {['7days', '1month', '3months', '1year', 'max'].map(period => (
               <button key={period} className={selectedPeriod === period ? "button active" : "button"} onClick={() => setSelectedPeriod(period)}>
-                {period}
+                {period.charAt(0).toUpperCase() + period.slice(1)}
               </button>
             ))}
           </div>
