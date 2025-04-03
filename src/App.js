@@ -213,14 +213,20 @@ function HijauSentiment() {
           </div>
 
           <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={sentimentTrend}>
-                <XAxis dataKey="date" stroke="#8884d8" />
-                <YAxis stroke="#8884d8" />
-                <Tooltip />
-                <Line type="monotone" dataKey="index" stroke="#82ca9d" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+            {sentimentTrend.length === 0 ? (
+              <p style={{ textAlign: "center", color: "gray", fontStyle: "italic" }}>
+                No data available for this timeframe.
+              </p>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={sentimentTrend}>
+                  <XAxis dataKey="date" stroke="#8884d8" />
+                  <YAxis stroke="#8884d8" />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="index" stroke="#82ca9d" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
