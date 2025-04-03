@@ -13,6 +13,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from database import get_db_connection
 from datetime import datetime, timezone
 import time
+import psycopg2
 
 # === CONFIG ===
 REDDIT_CLIENT_ID = "xMgGYXP3LJNxJMtyc6nH5Q"
@@ -57,7 +58,12 @@ def scrape_reddit(historical=False):
     if posts_data:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.executemany("INSERT INTO sentiment (date, tweet, sentiment_score) VALUES (%s, %s, %s)", posts_data)
+        for row in posts_data:
+            try:
+                cursor.execute("INSERT INTO sentiment (date, tweet, sentiment_score) VALUES (%s, %s, %s)", row)
+            except psycopg2.errors.UniqueViolation:
+                conn.rollback()  # Roll back the failed insert
+                continue         # Skip to next row
         conn.commit()
         cursor.close()
         conn.close()
@@ -67,7 +73,7 @@ def scrape_reddit(historical=False):
 
 if __name__ == "__main__":
     # Run historical collection ONCE
-    scrape_reddit(historical=True)
+    # scrape_reddit(historical=True)
 
     # Run these daily
     scrape_reddit(historical=False)
